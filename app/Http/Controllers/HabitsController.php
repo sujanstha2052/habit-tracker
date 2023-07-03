@@ -12,4 +12,14 @@ class HabitsController extends Controller
     $habits = Habit::all();
     return view('habits.index', ['habits' => $habits]);
   }
+
+  public function store(Request $request)
+  {
+    Habit::create([
+      'name' => $request->input('name'),
+      'times_per_day' => $request->input('times_per_day'),
+    ]);
+
+    return to_route('habits.index');
+  }
 }

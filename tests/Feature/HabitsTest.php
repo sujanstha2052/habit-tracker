@@ -13,7 +13,7 @@ class HabitsTest extends TestCase
   /**
    * A basic feature test example.
    */
-  public function test_that_the_habits_view_can_be_rendered(): void
+  public function test_habits_view_can_be_rendered(): void
   {
     $habits = Habit::factory(3)->create();
 
@@ -21,5 +21,15 @@ class HabitsTest extends TestCase
 
     $response->assertStatus(200);
     $response->assertViewHas('habits', $habits);
+  }
+
+  public function test_habits_can_be_created()
+  {
+    $habit = Habit::factory()->make();
+
+    $response = $this->withoutExceptionHandling()->post('/habits', $habit->toArray());
+
+    $response->assertRedirect('/habits');
+    $this->assertDatabaseHas('habits', $habit->toArray());
   }
 }
