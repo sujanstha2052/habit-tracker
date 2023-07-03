@@ -32,4 +32,48 @@ class HabitsTest extends TestCase
     $response->assertRedirect('/habits');
     $this->assertDatabaseHas('habits', $habit->toArray());
   }
+
+  public function test_habits_can_be_updated()
+  {
+    $habit = Habit::factory()->create();
+    $updatedHabit = [
+      'name' => 'updated',
+      'times_per_day' => 4
+    ];
+
+    $response = $this->withoutExceptionHandling()->put("/habits/{$habit->id}", $updatedHabit);
+
+    $response->assertRedirect('/habits');
+    $this->assertDatabaseHas('habits', ['id' => $habit->id, ...$updatedHabit]);
+  }
+
+  /**
+   * @dataProvider provideBadHabitData
+   */
+  public function test_create_habit_validation($missing, $habit)
+  {
+    $response = $this->post('/habits', $habit);
+    $response->assertSessionHasErrors([$missing]);
+  }
+
+  public function provideBadHabitData()
+  {
+    $habit = Habit::factory()->make();
+    return [
+      'missing name' => [
+        'name',
+        [
+          ...$habit->toArray(),
+          'name' => null,
+        ],
+      ],
+      'missing times_per_day' => [
+        'times_per_day',
+        [
+          ...$habit->toArray(),
+          'times_per_day' => null,
+        ],
+      ],
+    ];
+  }
 }
